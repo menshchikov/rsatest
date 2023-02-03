@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <script language="JavaScript" type="text/javascript" src="cryptico.min.js"></script>
+</head>
+
+<body>
+
+<label>pass phrase</label>
+<textarea id="passPhrase"></textarea>
+
+<label>public key</label>
+<textarea id="publicKey"></textarea>
+
+<button onclick="generateKeys(1)">Generate keys</button>
+
+<label>external public key</label>
+<textarea id="extPublicKey"></textarea>
+<hr/>
+<div>
+    <label>message</label>
+    <textarea id="message"></textarea>
+
+    <button onclick="encrypt()">Encrypt</button>
+
+    <label>encryptedMsg</label>
+    <textarea id="encryptedMsg"></textarea>
+</div>
+<hr/>
+<div>
+    <label>extEncryptedMsg</label>
+    <textarea id="extEncryptedMsg"></textarea>
+
+    <button onclick="decrypt()">Decrypt</button>
+
+    <label>extMessage</label>
+    <textarea id="extMessage"></textarea>
+</div>
+
+</body>
+<script lang="js">
+  var privateKey;
+
+  function generateKeys() {
+    var PassPhrase = document.getElementById('passPhrase').value;
+    var Bits = 512;
+
+    privateKey = cryptico.generateRSAKey(PassPhrase, Bits);
+    var publicKey = cryptico.publicKeyString(privateKey);
+
+    document.getElementById('publicKey').value = publicKey;
+  }
+
+  function encrypt() {
+    var msg = document.getElementById('message').value;
+    var extPublicKey = document.getElementById('extPublicKey').value
+    var EncryptionResult = cryptico.encrypt(msg, extPublicKey, privateKey);
+    document.getElementById('encryptedMsg').value = EncryptionResult.cipher
+  }
+
+  function decrypt() {
+    var extEncryptedMsg = document.getElementById('extEncryptedMsg').value;
+    var DecryptionResult = cryptico.decrypt(extEncryptedMsg, privateKey);
+    document.getElementById('extMessage').value = DecryptionResult.plaintext;
+  }
+</script>
+<style>
+    label {
+        display: block;
+    }
+</style>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
