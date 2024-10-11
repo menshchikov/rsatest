@@ -1,72 +1,148 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <script language="JavaScript" type="text/javascript" src="cryptico.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <title>RSA 512 cryptographic app</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
 
-<label>pass phrase</label>
-<textarea id="passPhrase"></textarea>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"
+        integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
+        crossorigin="anonymous"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
 
-<label>public key</label>
-<textarea id="publicKey"></textarea>
 
-<button onclick="generateKeys(1)">Generate keys</button>
+<!--<nav>-->
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <ul id="myTabs" class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#keys" aria-controls="keys" role="tab" data-toggle="tab">Keys</a>
+                </li>
+                <li role="presentation">
+                    <a href="#send" aria-controls="send" role="tab" data-toggle="tab">Send</a>
+                </li>
+                <li role="presentation">
+                    <a href="#receive" aria-controls="receive" role="tab" data-toggle="tab">Receive</a>
+                </li>
+            </ul>
+            <!--</nav>-->
+            <div class="tab-content">
 
-<label>external public key</label>
-<textarea id="extPublicKey"></textarea>
-<hr/>
-<div>
-    <label>message</label>
-    <textarea id="message"></textarea>
+                <div role="tabpanel" class="tab-pane active" id="keys">
+                    <div class="form-group">
+                        <label for="passPhrase">Pass phrase</label>
+                        <textarea id="passPhrase" class="form-control" rows="3"></textarea>
+                    </div>
 
-    <button onclick="encrypt()">Encrypt</button>
+                    <div class="form-group">
+                        <button onclick="generateKeys()">Generate keys</button>
+                    </div>
 
-    <label>encryptedMsg</label>
-    <textarea id="encryptedMsg"></textarea>
-</div>
-<hr/>
-<div>
-    <label>extEncryptedMsg</label>
-    <textarea id="extEncryptedMsg"></textarea>
+                    <div class="form-group">
+                        <label for="publicKey">Public key</label>
+                        <textarea id="publicKey" class="form-control" rows="3" readonly></textarea>
+                    </div>
+                </div>
 
-    <button onclick="decrypt()">Decrypt</button>
+                <div id="send" role="tabpanel" class="tab-pane">
+                    <div class="form-group">
+                        <label for="send_message">Message</label>
+                        <textarea id="send_message" class="form-control" rows="3"></textarea>
+                    </div>
 
-    <label>extMessage</label>
-    <textarea id="extMessage"></textarea>
+                    <div class="form-group">
+                        <label for="receiverPublicKey">Receiver public key</label>
+                        <textarea id="receiverPublicKey" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <button onclick="encrypt()">Encrypt</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="send_cipher">Cipher</label>
+                        <textarea id="send_cipher" class="form-control" rows="3" readonly></textarea>
+                    </div>
+                </div>
+
+                <div id="receive" role="tabpanel" class="tab-pane">
+                    <div class="form-group">
+                        <label for="receive_cipher">Cipher</label>
+                        <textarea id="receive_cipher" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passPhrase2">Pass phrase</label>
+                        <textarea id="passPhrase2" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <button onclick="decrypt()">Decrypt</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="receive_message">Message</label>
+                        <textarea id="receive_message" class="form-control" rows="3" readonly></textarea>
+                    </div>
+                </div>
+            </div> <!--tab-content-->
+        </div>
+    </div>
 </div>
 
 </body>
 <script lang="js">
-  var privateKey;
+    const BITS = 512;
 
-  function generateKeys() {
-    var PassPhrase = document.getElementById('passPhrase').value;
-    var Bits = 512;
+    $('#myTabs a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
 
-    privateKey = cryptico.generateRSAKey(PassPhrase, Bits);
-    var publicKey = cryptico.publicKeyString(privateKey);
+    function generateKeys() {
+        let pp = document.getElementById('passPhrase').value;
+        let privateKey = cryptico.generateRSAKey(pp, BITS);
+        document.getElementById('publicKey').value = cryptico.publicKeyString(privateKey);
+    }
 
-    document.getElementById('publicKey').value = publicKey;
-  }
+    function encrypt() {
+        let msg = document.getElementById('send_message').value;
+        let extPublicKey = document.getElementById('receiverPublicKey').value
+        let EncryptionResult = cryptico.encrypt(msg, extPublicKey);
+        document.getElementById('send_cipher').value = EncryptionResult.cipher;
+    }
 
-  function encrypt() {
-    var msg = document.getElementById('message').value;
-    var extPublicKey = document.getElementById('extPublicKey').value
-    var EncryptionResult = cryptico.encrypt(msg, extPublicKey, privateKey);
-    document.getElementById('encryptedMsg').value = EncryptionResult.cipher
-  }
-
-  function decrypt() {
-    var extEncryptedMsg = document.getElementById('extEncryptedMsg').value;
-    var DecryptionResult = cryptico.decrypt(extEncryptedMsg, privateKey);
-    document.getElementById('extMessage').value = DecryptionResult.plaintext;
-  }
+    function decrypt() {
+        let pp = document.getElementById('passPhrase2').value;
+        let privateKey = cryptico.generateRSAKey(pp, BITS);
+        let cipher = document.getElementById('receive_cipher').value;
+        let DecryptionResult = cryptico.decrypt(cipher, privateKey);
+        document.getElementById('receive_message').value = DecryptionResult.plaintext;
+    }
 </script>
 <style>
     label {
         display: block;
+    }
+
+    .tab-pane {
+        padding: 10px 0;
+    }
+    .container{
     }
 </style>
 
