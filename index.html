@@ -104,6 +104,13 @@
     </div>
 </div>
 
+<script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="AuthRsaTestBot" data-size="large"
+        data-onauth="onTelegramAuth(user)"></script>
+<script type="text/javascript">    function onTelegramAuth(user) {
+    console.log('it works');
+}
+</script>
+
 </body>
 <script lang="js">
     const BITS = 512;
